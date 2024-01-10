@@ -28,6 +28,9 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 
+# allauth site_id
+SITE_ID = 3
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -37,12 +40,27 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # create app
     "restaurant",
+    "accounts",
 
     # lib
     "rest_framework",
+    # allauth
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    # allauth - kakao
+    'allauth.socialaccount.providers.kakao',
 ]
 
-MIDDLEWARE = [
+# 로그인 후 리디렉션할 페이지
+LOGIN_REDIRECT_URL = '/'
+# 로그아웃 후 리디렉션할 페이지
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+# 로그아웃 버튼 클릭 시 자동 로그아웃
+ACCOUNT_LOGOUT_ON_GET = True
+
+MIDDLEWARE = {
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -50,7 +68,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-]
+
+    'allauth.account.middleware.AccountMiddleware',
+
+}
 
 ROOT_URLCONF = "mnuUniteProject.urls"
 
@@ -109,9 +130,36 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# allauth backends
+AUTHENTICATION_BACKENDS = (
+    # 'allauth' specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+
+    # Needed to login by username in Django admin, regardless of 'allauth'
+    'django.contrib.auth.backends.ModelBackend',
+
+)
+
+SOCIALACCOUNT_PROVIDERS = {
+    'kakao': {
+        'SCOPE': [
+            'profile_nickname',
+            'profile_image',
+            'account_email',
+
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
